@@ -14,7 +14,6 @@
 | **Provinces** | 6 |
 | **Season** | 26 June – 1 October 2025 |
 | **Variables** | 34 per district |
-| **Missing values** | 0 |
 
 ---
 
