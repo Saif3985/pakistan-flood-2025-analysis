@@ -15,16 +15,6 @@
 | **Season** | 26 June – 1 October 2025 |
 | **Variables** | 34 per district |
 
----
-
-## 🛰️ Data Sources
-
-| Source | Data |
-|---|---|
-| NDMA / PDMA | Deaths, injuries, houses, roads, rescue |
-| OCHA / UNICEF / WHO | Cross-verification |
-| UNOSAT VIIRS | Flood extent polygons FL20250818PAK |
-| Sentinel-1 SAR | Temporal flood zones via Google Earth Engine |
 
 ---
 
