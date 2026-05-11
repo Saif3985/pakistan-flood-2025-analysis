@@ -15,7 +15,6 @@
 | **Season** | 26 June – 1 October 2025 |
 | **Variables** | 34 per district |
 | **Missing values** | 0 |
-| **Total deaths** | 802 (NDMA verified) |
 
 ---
 
@@ -65,17 +64,7 @@ jupyter notebook Pakistan_Flood_2025_Analysis_DOCUMENTED.ipynb
 
 ---
 
-## 📊 Analysis Includes (18 Charts)
 
-- Deaths by province · Gender & age breakdown · Top 10 districts bubble
-- Flood event timeline (two-phase discovery)
-- Infrastructure & agricultural damage · Multi-metric heatmap
-- Province risk radar · VIIRS flooded area vs deaths scatter
-- SAR temporal zonation (Phase 1 KPK vs Phase 2 Punjab)
-- Pakistan choropleth flood map · Rescue operations
-- Damage index correlation · Child vulnerability analysis
-
----
 
 ## 🗺️ Methodology
 
@@ -87,8 +76,6 @@ District-level impact dataset (50 districts · 34 columns · 0 missing)
 UNOSAT VIIRS shapefile → flooded km² per district
         ↓
 Sentinel-1 SAR via Google Earth Engine → temporal zones (Phase 1 & 2)
-        ↓
-Plotly interactive analysis → 18 publication-ready charts
 ```
 
 ---
@@ -117,4 +104,3 @@ Plotly interactive analysis → 18 publication-ready charts
 
 ---
 
-*Data sourced from official NDMA/PDMA/OCHA public humanitarian reports. Open for research use.*
