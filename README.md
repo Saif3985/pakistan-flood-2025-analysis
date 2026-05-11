@@ -1,4 +1,4 @@
-# 🌊 Pakistan 2025 Monsoon Flood Analysis
+#  Pakistan 2025 Monsoon Flood Analysis
 
 > Spatial & temporal flood mapping of the 2025 Pakistan monsoon floods using NDMA verified data, VIIRS satellite imagery, and Sentinel-1 SAR.
 
