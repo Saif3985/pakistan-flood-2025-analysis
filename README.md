@@ -2,7 +2,13 @@
 
 > Spatial & temporal flood mapping of the 2025 Pakistan monsoon floods 
 
+
+![Flood Map](pakistan_flood_dashboard.png)
+
+---
+
 ![Flood Map](flood.png)
+
 
 ---
 
