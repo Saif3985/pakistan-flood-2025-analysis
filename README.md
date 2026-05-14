@@ -3,7 +3,7 @@
 > Spatial & temporal flood mapping of the 2025 Pakistan monsoon floods 
 
 ## 🌐 Interactive Dashboard
-[View Live Dashboard →](https://saif3985.github.io/pakistan-flood-2025-analysis/pakistan_flood_dashboard.html)
+[Click here to view interactive dashboard  →](https://saif3985.github.io/pakistan-flood-2025-analysis/pakistan_flood_dashboard.html)
 
 ---
 
