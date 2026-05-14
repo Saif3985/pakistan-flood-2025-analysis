@@ -9,9 +9,6 @@
 
 ![Flood Map](pakistan_flood_dashboard.png)
 
----
-
-![Flood Map](flood.png)
 
 
 ---
