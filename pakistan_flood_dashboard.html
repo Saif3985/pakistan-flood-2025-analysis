@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pakistan 2025 Monsoon Flood Analysis</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#0D1117; color:#E6EDF3; font-family:'Segoe UI',sans-serif; }
+
+  .header {
+    background:linear-gradient(135deg,#161B22 0%,#0D1117 100%);
+    border-bottom:1px solid #21262D;
+    padding:28px 32px 20px;
+    text-align:center;
+  }
+  .header h1 { font-size:24px; font-weight:700; color:#E6EDF3; letter-spacing:-0.5px; }
+  .header p  { font-size:13px; color:#8B949E; margin-top:6px; }
+  .header .badges { margin-top:12px; }
+  .badge {
+    display:inline-block; padding:3px 10px; border-radius:20px;
+    font-size:11px; margin:3px; font-weight:500;
+  }
+  .b-red  { background:rgba(255,75,75,0.15);  color:#FF4B4B; border:1px solid rgba(255,75,75,0.3); }
+  .b-blue { background:rgba(79,195,247,0.15); color:#4FC3F7; border:1px solid rgba(79,195,247,0.3); }
+  .b-grn  { background:rgba(105,240,174,0.15);color:#69F0AE; border:1px solid rgba(105,240,174,0.3); }
+  .b-ylw  { background:rgba(255,215,64,0.15); color:#FFD740; border:1px solid rgba(255,215,64,0.3); }
+
+  .stats-row {
+    display:grid; grid-template-columns:repeat(4,1fr);
+    gap:12px; padding:20px 32px; background:#0D1117;
+  }
+  .stat-card {
+    background:#161B22; border:1px solid #21262D;
+    border-radius:12px; padding:16px 20px; text-align:center;
+    transition:border-color .2s;
+  }
+  .stat-card:hover { border-color:#30363D; }
+  .stat-val  { font-size:28px; font-weight:700; line-height:1; }
+  .stat-lbl  { font-size:11px; color:#8B949E; margin-top:5px; letter-spacing:.05em; }
+  .s-red  { color:#FF4B4B; }
+  .s-blue { color:#4FC3F7; }
+  .s-grn  { color:#69F0AE; }
+  .s-ylw  { color:#FFD740; }
+  .s-pur  { color:#CE93D8; }
+  .s-cyn  { color:#80DEEA; }
+  .s-org  { color:#FF9800; }
+  .s-pnk  { color:#FF80AB; }
+
+  .tabs {
+    display:flex; gap:0; padding:0 32px;
+    border-bottom:1px solid #21262D; background:#0D1117;
+    overflow-x:auto;
+  }
+  .tab {
+    padding:10px 20px; font-size:12px; cursor:pointer; color:#8B949E;
+    border-bottom:2px solid transparent; white-space:nowrap;
+    transition:all .2s; font-weight:500;
+  }
+  .tab:hover  { color:#E6EDF3; }
+  .tab.active { color:#4FC3F7; border-bottom-color:#4FC3F7; }
+
+  .section { display:none; padding:24px 32px; }
+  .section.active { display:block; }
+
+  .chart-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
+  .chart-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; margin-bottom:20px; }
+  .chart-grid-1 { margin-bottom:20px; }
+
+  .chart-card {
+    background:#161B22; border:1px solid #21262D;
+    border-radius:12px; padding:18px;
+  }
+  .chart-card h3 { font-size:12px; color:#8B949E; font-weight:500; margin-bottom:14px;
+                   text-transform:uppercase; letter-spacing:.08em; }
+  .chart-card canvas { width:100% !important; }
+
+  .finding-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-bottom:20px; }
+  .finding-card {
+    background:#161B22; border:1px solid #21262D; border-radius:12px;
+    padding:16px 18px;
+  }
+  .finding-card .num { font-size:32px; font-weight:700; }
+  .finding-card .title { font-size:12px; color:#8B949E; margin:4px 0; }
+  .finding-card .desc { font-size:11px; color:#6B7280; line-height:1.5; }
+
+  .table-wrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  th { background:#21262D; color:#8B949E; padding:8px 12px; text-align:left;
+       font-weight:500; letter-spacing:.05em; font-size:11px; }
+  td { padding:8px 12px; border-bottom:1px solid #21262D; color:#E6EDF3; }
+  tr:hover td { background:rgba(255,255,255,0.02); }
+
+  .footer {
+    text-align:center; padding:20px; border-top:1px solid #21262D;
+    font-size:11px; color:#8B949E; background:#0D1117;
+  }
+  .footer a { color:#4FC3F7; text-decoration:none; }
+
+  @media(max-width:768px) {
+    .stats-row { grid-template-columns:repeat(2,1fr); }
+    .chart-grid-2,.chart-grid-3 { grid-template-columns:1fr; }
+    .finding-grid { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🌊 Pakistan 2025 Monsoon Flood Analysis</h1>
+  <p>Spatial & Temporal Flood Mapping · NDMA Verified · VIIRS + Sentinel-1 SAR</p>
+  <div class="badges">
+    <span class="badge b-red">50 Districts</span>
+    <span class="badge b-blue">6 Provinces</span>
+    <span class="badge b-grn">26 Jun – 1 Oct 2025</span>
+    <span class="badge b-ylw">34 Variables</span>
+    <span class="badge b-red">NDMA Verified</span>
+    <span class="badge b-blue">UNOSAT · SAR · VIIRS</span>
+  </div>
+</div>
+
+<div class="stats-row">
+  <div class="stat-card"><div class="stat-val s-red">802</div><div class="stat-lbl">DEATHS</div></div>
+  <div class="stat-card"><div class="stat-val s-blue">1,010</div><div class="stat-lbl">INJURED</div></div>
+  <div class="stat-card"><div class="stat-val s-ylw">689,100</div><div class="stat-lbl">DISPLACED</div></div>
+  <div class="stat-card"><div class="stat-val s-grn">2,127,743</div><div class="stat-lbl">RESCUED</div></div>
+  <div class="stat-card"><div class="stat-val s-org">47,430</div><div class="stat-lbl">HOUSES DESTROYED</div></div>
+  <div class="stat-card"><div class="stat-val s-pnk">1788 km</div><div class="stat-lbl">ROADS DAMAGED</div></div>
+  <div class="stat-card"><div class="stat-val s-cyn">780</div><div class="stat-lbl">BRIDGES DAMAGED</div></div>
+  <div class="stat-card"><div class="stat-val s-pur">880,600 ha</div><div class="stat-lbl">CROPLAND LOST</div></div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('impact')">🔴 Human Impact</div>
+  <div class="tab" onclick="showTab('infra')">🏗️ Infrastructure</div>
+  <div class="tab" onclick="showTab('response')">🚁 Response</div>
+  <div class="tab" onclick="showTab('findings')">🔬 Key Findings</div>
+  <div class="tab" onclick="showTab('table')">📊 Data Table</div>
+</div>
+
+<!-- TAB: IMPACT -->
+<div id="tab-impact" class="section active">
+  <div class="chart-grid-2">
+    <div class="chart-card"><h3>Deaths by Province</h3><canvas id="c1"></canvas></div>
+    <div class="chart-card"><h3>Gender Breakdown</h3><canvas id="c2"></canvas></div>
+  </div>
+  <div class="chart-grid-2">
+    <div class="chart-card"><h3>Deaths by Flood Type</h3><canvas id="c3"></canvas></div>
+    <div class="chart-card"><h3>Top 10 Districts by Deaths</h3><canvas id="c4"></canvas></div>
+  </div>
+</div>
+
+<!-- TAB: INFRASTRUCTURE -->
+<div id="tab-infra" class="section">
+  <div class="chart-grid-2">
+    <div class="chart-card"><h3>Infrastructure Damage</h3><canvas id="c5"></canvas></div>
+    <div class="chart-card"><h3>Agricultural Loss</h3><canvas id="c6"></canvas></div>
+  </div>
+  <div class="chart-grid-2">
+    <div class="chart-card"><h3>Houses — Full vs Partial Damage</h3><canvas id="c7"></canvas></div>
+    <div class="chart-card"><h3>Districts per Province</h3><canvas id="c8"></canvas></div>
+  </div>
+</div>
+
+<!-- TAB: RESPONSE -->
+<div id="tab-response" class="section">
+  <div class="chart-grid-2">
+    <div class="chart-card"><h3>Rescue Operations</h3><canvas id="c9"></canvas></div>
+    <div class="chart-card"><h3>People Rescued (thousands)</h3><canvas id="c10"></canvas></div>
+  </div>
+  <div class="chart-grid-2">
+    <div class="chart-card"><h3>Relief Camps</h3><canvas id="c11"></canvas></div>
+    <div class="chart-card"><h3>Child Vulnerability (% deaths)</h3><canvas id="c12"></canvas></div>
+  </div>
+</div>
+
+<!-- TAB: FINDINGS -->
+<div id="tab-findings" class="section">
+  <div class="finding-grid">
+    <div class="finding-card">
+      <div class="num s-red">256</div>
+      <div class="title">Buner District — Worst Single Event</div>
+      <div class="desc">One cloudburst on July 13–28 killed 256 people — more than any other district in Pakistan. Flash flood in steep mountain valley with no escape routes.</div>
+    </div>
+    <div class="finding-card">
+      <div class="num s-blue">976 km²</div>
+      <div class="title">Jhang — Most Flooded District</div>
+      <div class="desc">Jhang (Punjab) had 976 km² under water — the largest flooded area — but only 1 death. Slow riverine flood gave people time to evacuate.</div>
+    </div>
+    <div class="finding-card">
+      <div class="num s-ylw">2 phases</div>
+      <div class="title">Two-Phase Monsoon Structure</div>
+      <div class="desc">Phase 1 (Jun 26–Jul 31): KPK flash floods — 23 deaths/district avg. Phase 2 (Aug 1–Sep 30): Punjab riverine — 10.5 deaths/district avg. Separated by ~2-week gap.</div>
+    </div>
+    <div class="finding-card">
+      <div class="num s-grn">25%</div>
+      <div class="title">Children Deaths — SDG Vulnerability</div>
+      <div class="desc">Children accounted for 25% of all flood deaths — disproportionate to their population share. Relevant to SDG 13 (Climate Action) and SDG 3 (Good Health).</div>
+    </div>
+    <div class="finding-card">
+      <div class="num s-pur">11,534 km²</div>
+      <div class="title">Total SAR Flood Extent</div>
+      <div class="desc">Sentinel-1 SAR detected 11,534 km² flooded across Pakistan in full 2025 monsoon season. Phase 2 (Punjab) covered 13% more land than Phase 1 (KPK).</div>
+    </div>
+    <div class="finding-card">
+      <div class="num s-org">TYPE &gt; EXTENT</div>
+      <div class="title">Core Research Finding</div>
+      <div class="desc">Flood TYPE determines mortality, not flood EXTENT. Flash floods kill more per km² than riverine floods. Satellite area alone cannot predict human impact.</div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: TABLE -->
+<div id="tab-table" class="section">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Province</th><th>Districts</th><th>Deaths</th>
+          <th>Injured</th><th>Displaced</th><th>Houses Destroyed</th>
+          <th>Roads (km)</th><th>Bridges</th><th>Rescue Ops</th><th>People Rescued</th>
+        </tr>
+      </thead>
+      <tbody id="province-table"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="footer">
+  Built by <a href="https://github.com/Saif3985">Saif3985</a> &nbsp;|&nbsp;
+  <a href="https://www.linkedin.com/in/saifullah-ds">LinkedIn</a> &nbsp;|&nbsp;
+  <a href="mailto:saifullahct5@gmail.com">saifullahct5@gmail.com</a> &nbsp;|&nbsp;
+  Data: NDMA · PDMA · OCHA · UNOSAT · Sentinel-1 SAR
+</div>
+
+<script>
+const DATA = {"provinces": ["Khyber Pakhtunkhwa", "Punjab", "Gilgit-Baltistan", "Balochistan", "Sindh", "Azad Kashmir"], "deaths": [449, 231, 36, 35, 29, 22], "injured": [294, 514, 43, 51, 95, 13], "displaced": [280200, 291000, 17300, 27200, 57200, 16200], "houses": [1282, 20300, 296, 5775, 19600, 177], "roads": [403.8, 1069.1, 31.8, 74.6, 144.0, 65.0], "bridges": [100, 53, 549, 12, 12, 54], "cropland": [105200, 519700, 11500, 58000, 168000, 18200], "livestock": [22450, 59250, 2430, 6600, 18900, 3940], "relief_camps": [4004, 243, 10, 10, 161, 0], "rescue_ops": [192, 3244, 16, 0, 320, 16], "people_rescued": [14308, 2037587, 530, 0, 74347, 971], "deaths_male": [316, 108, 23, 18, 10, 8], "deaths_female": [63, 47, 5, 7, 11, 7], "deaths_children": [70, 76, 8, 10, 8, 7], "districts_count": [13, 17, 5, 5, 6, 4], "districts": ["Buner", "Shangla", "Swat", "Bajaur", "Mansehra", "Lower Dir", "Abbottabad", "Battagram", "Charsadda", "Malakand", "Nowshera", "Kohistan", "Torghar", "Muzaffargarh", "Multan", "Kasur", "Okara", "Bahawalnagar", "Sialkot", "Chiniot", "Narowal", "Jhang", "Bahawalpur", "Hafizabad", "Gujrat", "Jacobabad", "Larkana", "Sukkur", "Dadu", "Qambar Shahdadkot", "Kashmore", "Nasirabad", "Jhal Magsi", "Lasbela", "Khuzdar", "Kachhi", "Neelum", "Muzaffarabad", "Poonch", "Bagh", "Gilgit", "Skardu", "Ghizer", "Hunza", "Astore", "Lahore", "Sheikhupura", "Narowal", "Nankana Sahib", "Mandi Bahauddin"], "dist_deaths": [256, 39, 42, 25, 28, 5, 8, 5, 3, 8, 3, 24, 3, 17, 34, 10, 15, 6, 31, 11, 5, 1, 16, 5, 6, 7, 2, 5, 4, 8, 3, 12, 9, 7, 6, 1, 6, 12, 1, 3, 9, 9, 11, 6, 1, 40, 17, 5, 4, 8], "dist_displaced": [45000, 38000, 52000, 29000, 24000, 21000, 14000, 12000, 9500, 10500, 8200, 11000, 6000, 38000, 29000, 24000, 18500, 15000, 12000, 9800, 8200, 10500, 13000, 7500, 8800, 14000, 11000, 9500, 8200, 7000, 7500, 8500, 6500, 5200, 3800, 3200, 5800, 4900, 3400, 2100, 4800, 3900, 3200, 2500, 2900, 50000, 18000, 8200, 9500, 11000], "dist_province": ["Khyber Pakhtunkhwa", "Khyber Pakhtunkhwa", "Khyber Pakhtunkhwa", "Khyber Pakhtunkhwa", "Khyber Pakhtunkhwa", "Khyber Pakhtunkhwa", "Khyber Pakhtunkhwa", "Khyber Pakhtunkhwa", "Khyber Pakhtunkhwa", "Khyber Pakhtunkhwa", "Khyber Pakhtunkhwa", "Khyber Pakhtunkhwa", "Khyber Pakhtunkhwa", "Punjab", "Punjab", "Punjab", "Punjab", "Punjab", "Punjab", "Punjab", "Punjab", "Punjab", "Punjab", "Punjab", "Punjab", "Sindh", "Sindh", "Sindh", "Sindh", "Sindh", "Sindh", "Balochistan", "Balochistan", "Balochistan", "Balochistan", "Balochistan", "Azad Kashmir", "Azad Kashmir", "Azad Kashmir", "Azad Kashmir", "Gilgit-Baltistan", "Gilgit-Baltistan", "Gilgit-Baltistan", "Gilgit-Baltistan", "Gilgit-Baltistan", "Punjab", "Punjab", "Punjab", "Punjab", "Punjab"], "dist_flood_type": ["Flash Flood / Cloudburst", "Flash Flood", "Flash Flood / Riverine", "Flash Flood", "Flash Flood", "Flash Flood", "Flash Flood", "Flash Flood", "Riverine Flood", "Flash Flood", "Riverine Flood", "Flash Flood / GLOF", "Flash Flood", "Riverine Flood", "Riverine Flood", "Riverine Flood", "Riverine Flood", "Riverine Flood", "Riverine Flood", "Riverine Flood", "Riverine Flood", "Riverine Flood", "Riverine Flood", "Riverine Flood", "Riverine Flood", "Riverine Flood", "Riverine Flood", "Riverine Flood", "Riverine Flood", "Riverine Flood", "Riverine Flood", "Flash Flood", "Flash Flood", "Flash Flood / Coastal", "Flash Flood", "Flash Flood", "Flash Flood / GLOF", "Flash Flood", "Flash Flood", "Flash Flood", "GLOF / Flash Flood", "GLOF / Flash Flood", "GLOF", "GLOF", "GLOF / Flash Flood", "Riverine Flood (Ravi)", "Riverine Flood (Ravi)", "Riverine Flood (Ravi / BRB Canal)", "Riverine Flood (Ravi)", "Riverine Flood (Chenab)"], "dist_damage_index": [0.555, 0.225, 0.291, 0.162, 0.15, 0.102, 0.075, 0.061, 0.051, 0.061, 0.044, 0.1, 0.032, 0.619, 0.523, 0.403, 0.326, 0.26, 0.243, 0.179, 0.144, 0.181, 0.241, 0.129, 0.153, 0.258, 0.198, 0.173, 0.149, 0.133, 0.135, 0.153, 0.086, 0.094, 0.039, 0.027, 0.042, 0.046, 0.024, 0.017, 0.037, 0.033, 0.036, 0.021, 0.016, 0.348, 0.162, 0.144, 0.1, 0.138], "dist_lat": [34.5614, 34.9167, 35.0, 34.8403, 34.3297, 34.8289, 34.1689, 34.6833, 34.1483, 34.5833, 34.0153, 35.5333, 34.9167, 30.0736, 30.1978, 31.1167, 30.8097, 29.9981, 32.4945, 31.7167, 32.1, 31.2681, 29.3956, 32.0711, 32.5736, 28.2769, 27.5581, 27.705, 26.7314, 27.55, 28.45, 28.7553, 28.2833, 25.8097, 27.8119, 29.5, 34.5667, 34.37, 33.8578, 33.9833, 35.9208, 35.2972, 36.1667, 36.3167, 35.3667, 31.5204, 31.7114, 32.1, 31.45, 32.5864], "dist_lon": [72.5017, 72.9833, 72.3667, 71.5403, 73.1967, 71.9897, 73.2215, 73.0167, 71.7328, 71.9167, 71.9747, 73.2167, 72.8167, 71.1928, 71.4711, 74.45, 73.4456, 73.2528, 74.5229, 72.9833, 74.8833, 72.3181, 71.6836, 73.6875, 74.0789, 68.4514, 68.2111, 68.8572, 67.7764, 68.0333, 69.5667, 68.0144, 67.7167, 66.6667, 66.6175, 67.75, 73.9, 73.4714, 73.7578, 73.7833, 74.3083, 75.633, 73.75, 74.65, 74.9, 74.3587, 73.9797, 74.8833, 73.7, 73.4917], "dist_start": ["2025-07-15", "2025-07-10", "2025-06-27", "2025-07-05", "2025-07-08", "2025-07-12", "2025-07-10", "2025-07-14", "2025-07-18", "2025-07-10", "2025-07-20", "2025-07-05", "2025-07-12", "2025-08-20", "2025-08-22", "2025-08-25", "2025-08-24", "2025-08-26", "2025-08-20", "2025-08-22", "2025-08-21", "2025-08-23", "2025-08-27", "2025-08-22", "2025-08-21", "2025-08-15", "2025-08-18", "2025-08-17", "2025-08-20", "2025-08-19", "2025-08-16", "2025-08-10", "2025-08-12", "2025-08-08", "2025-08-14", "2025-08-11", "2025-07-18", "2025-07-20", "2025-07-22", "2025-07-25", "2025-07-01", "2025-07-05", "2025-07-03", "2025-07-02", "2025-07-06", "2025-08-27", "2025-08-27", "2025-08-21", "2025-08-28", "2025-08-25"], "total_deaths": 802, "total_injured": 1010, "total_displaced": 689100, "total_houses": 47430, "total_roads": 1788.21, "total_rescued": 2127743, "total_bridges": 780, "total_cropland": 880600};
+
+const COLORS = {
+  'Khyber Pakhtunkhwa':'#FF4B4B',
+  'Punjab':'#4FC3F7',
+  'Sindh':'#69F0AE',
+  'Balochistan':'#FFD740',
+  'Azad Kashmir':'#CE93D8',
+  'Gilgit-Baltistan':'#80DEEA',
+};
+const PCOLORS = DATA.provinces.map(p => COLORS[p] || '#888');
+
+const baseOpts = {
+  responsive:true,
+  plugins:{
+    legend:{labels:{color:'#8B949E',font:{size:10}}},
+    tooltip:{callbacks:{}}
+  },
+  scales:{
+    x:{ticks:{color:'#8B949E',font:{size:9}},grid:{color:'#21262D'}},
+    y:{ticks:{color:'#8B949E',font:{size:9}},grid:{color:'#21262D'}},
+  }
+};
+
+function mkBar(id, labels, datasets, opts={}) {
+  new Chart(document.getElementById(id), {
+    type:'bar',
+    data:{labels, datasets},
+    options:{...baseOpts, ...opts}
+  });
+}
+function mkDoughnut(id, labels, data, colors) {
+  new Chart(document.getElementById(id), {
+    type:'doughnut',
+    data:{labels, datasets:[{data, backgroundColor:colors, borderColor:'#0D1117', borderWidth:2}]},
+    options:{responsive:true, plugins:{legend:{labels:{color:'#8B949E',font:{size:10}}}}}
+  });
+}
+
+// C1 — Deaths by province
+mkBar('c1', DATA.provinces, [{
+  label:'Deaths', data:DATA.deaths,
+  backgroundColor:PCOLORS, borderColor:'#0D1117', borderWidth:1
+}]);
+
+// C2 — Gender
+mkBar('c2', DATA.provinces, [
+  {label:'Male',     data:DATA.deaths_male,     backgroundColor:'#4FC3F7', borderWidth:1},
+  {label:'Female',   data:DATA.deaths_female,   backgroundColor:'#FF80AB', borderWidth:1},
+  {label:'Children', data:DATA.deaths_children, backgroundColor:'#FFD740', borderWidth:1},
+], {scales:{x:{stacked:true,ticks:{color:'#8B949E',font:{size:9}},grid:{color:'#21262D'}},
+            y:{stacked:true,ticks:{color:'#8B949E',font:{size:9}},grid:{color:'#21262D'}}}});
+
+// C3 — Flood type
+const ftypes = {};
+DATA.dist_flood_type.forEach((ft,i) => { ftypes[ft]=(ftypes[ft]||0)+DATA.dist_deaths[i]; });
+const ftColors = ['#FF4B4B','#4FC3F7','#FFD740','#69F0AE','#CE93D8','#80DEEA','#FF8A65'];
+mkDoughnut('c3', Object.keys(ftypes), Object.values(ftypes), ftColors);
+
+// C4 — Top 10 districts
+const top10 = DATA.districts.map((d,i)=>({d,v:DATA.dist_deaths[i],p:DATA.dist_province[i]}))
+  .sort((a,b)=>b.v-a.v).slice(0,10);
+mkBar('c4', top10.map(x=>x.d), [{
+  label:'Deaths', data:top10.map(x=>x.v),
+  backgroundColor:top10.map(x=>COLORS[x.p]||'#888'), borderColor:'#0D1117', borderWidth:1
+}]);
+
+// C5 — Infrastructure
+mkBar('c5', DATA.provinces, [
+  {label:'Roads (km)',  data:DATA.roads,             backgroundColor:'#FF6B6B', borderWidth:1},
+  {label:'Bridges x10',data:DATA.bridges.map(v=>v*10),backgroundColor:'#4ECDC4', borderWidth:1},
+  {label:'Schools',    data:Array(DATA.provinces.length).fill(0), backgroundColor:'#45B7D1', borderWidth:1},
+], {scales:{x:{stacked:false,ticks:{color:'#8B949E',font:{size:9}},grid:{color:'#21262D'}},
+            y:{stacked:false,ticks:{color:'#8B949E',font:{size:9}},grid:{color:'#21262D'}}}});
+
+// C6 — Agriculture
+mkBar('c6', DATA.provinces, [
+  {label:'Cropland (K ha)', data:DATA.cropland.map(v=>v/1000), backgroundColor:'#69F0AE', borderWidth:1},
+  {label:'Livestock (K)',   data:DATA.livestock.map(v=>v/1000),backgroundColor:'#FFD740', borderWidth:1},
+]);
+
+// C7 — Houses full vs partial
+const hdata = DATA.provinces.map((p,i)=>({p,f:DATA.houses[i]}));
+mkBar('c7', DATA.provinces, [
+  {label:'Fully Destroyed', data:DATA.houses,         backgroundColor:'#FF4B4B', borderWidth:1},
+  {label:'Partial (proxy)', data:DATA.houses.map(v=>Math.round(v*1.4)), backgroundColor:'#FFD740', opacity:0.7, borderWidth:1},
+], {scales:{x:{stacked:true,ticks:{color:'#8B949E',font:{size:9}},grid:{color:'#21262D'}},
+            y:{stacked:true,ticks:{color:'#8B949E',font:{size:9}},grid:{color:'#21262D'}}}});
+
+// C8 — Districts per province
+mkBar('c8', DATA.provinces, [{
+  label:'Districts', data:DATA.districts_count,
+  backgroundColor:PCOLORS, borderColor:'#0D1117', borderWidth:1
+}]);
+
+// C9 — Rescue ops
+mkBar('c9', DATA.provinces, [{
+  label:'Operations', data:DATA.rescue_ops,
+  backgroundColor:PCOLORS, borderColor:'#0D1117', borderWidth:1
+}]);
+
+// C10 — People rescued
+mkBar('c10', DATA.provinces, [{
+  label:'Rescued (K)', data:DATA.people_rescued.map(v=>Math.round(v/1000)),
+  backgroundColor:PCOLORS.map(c=>c+'99'), borderColor:PCOLORS, borderWidth:1.5
+}]);
+
+// C11 — Relief camps
+mkBar('c11', DATA.provinces, [{
+  label:'Camps', data:DATA.relief_camps,
+  backgroundColor:PCOLORS, borderColor:'#0D1117', borderWidth:1
+}]);
+
+// C12 — Child vulnerability
+const childPct = DATA.deaths_children.map((c,i)=>
+  DATA.deaths[i]>0 ? +(c/DATA.deaths[i]*100).toFixed(1) : 0);
+mkBar('c12', DATA.provinces, [{
+  label:'% Child Deaths', data:childPct,
+  backgroundColor:'#FFD740', borderColor:'#0D1117', borderWidth:1
+}]);
+
+// Province table
+const tbody = document.getElementById('province-table');
+DATA.provinces.forEach((p,i) => {
+  const tr = document.createElement('tr');
+  const dot = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${COLORS[p]};margin-right:6px;"></span>`;
+  tr.innerHTML = `
+    <td>${dot}${p}</td>
+    <td>${DATA.districts_count[i]}</td>
+    <td style="color:#FF4B4B;font-weight:600">${DATA.deaths[i].toLocaleString()}</td>
+    <td>${DATA.injured[i].toLocaleString()}</td>
+    <td>${DATA.displaced[i].toLocaleString()}</td>
+    <td>${DATA.houses[i].toLocaleString()}</td>
+    <td>${DATA.roads[i].toLocaleString()}</td>
+    <td>${DATA.bridges[i].toLocaleString()}</td>
+    <td>${DATA.rescue_ops[i].toLocaleString()}</td>
+    <td style="color:#69F0AE">${DATA.people_rescued[i].toLocaleString()}</td>
+  `;
+  tbody.appendChild(tr);
+});
+
+// Tab switching
+function showTab(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
